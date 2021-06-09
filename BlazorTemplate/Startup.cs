@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using BlazorTemplate.Areas.Identity;
 using BlazorTemplate.Data;
 using BlazorTemplate.Models;
+using BlazorTemplate.Hubs;
 
 namespace BlazorTemplate
 {
@@ -83,6 +84,7 @@ namespace BlazorTemplate
             {
                 endpoints.MapControllers();
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<TestHub>("/testhub");
                 endpoints.MapFallbackToPage("/_Host");
             });
         }

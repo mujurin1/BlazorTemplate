@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.SignalR.Client
 @page "/"
 
 <h1>Hello, world!</h1>
@@ -5,3 +6,39 @@
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+
+<div>
+  SentMsg: @SentMsg<br />
+  <button @onclick="Send">Send</button>
+  <input type="text" @bind-value="SendMsg" />
+</div>
+
+@code{
+  private HubConnection TestHub;
+  [Inject]
+  public NavigationManager Navigation { get; set; }
+
+  /// <summary>送るメッセージ</summary>
+  private string SendMsg { get; set; }
+  /// <summary>送られて来たメッセージ</summary>
+  private string SentMsg { get; set; }
+
+  protected override async Task OnInitializedAsync()
+  {
+    TestHub = new HubConnectionBuilder()
+          .WithUrl(Navigation.ToAbsoluteUri("/testhub"))
+          .Build();
+
+    TestHub.On<string>("Hello", msg => {
+      SentMsg = msg;
+      StateHasChanged();
+    });
+
+    await TestHub.StartAsync();
+  }
+
+  private async Task Send()
+  {
+    await TestHub.SendAsync("Hello", SendMsg);
+  }
+}
